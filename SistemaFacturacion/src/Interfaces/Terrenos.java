@@ -9,6 +9,8 @@ import java.awt.Font;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -18,27 +20,31 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Terrenos extends javax.swing.JInternalFrame {
 
-    DefaultTableModel modelo;
+    Statement st = null;
+    ResultSet rs = null;
 
-    /**
-     * Creates new form Terrenos
-     *
-     */
-    public Connection Conectar() {
+    public Connection establecerConexion() {
         Connection conn = null;
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sistemafacturacion", "root", "Wolfhack0504");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/facturacion_crud", "root", "HonDa8512118560745");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "No se puedo realizar la conexion" + e.toString());
         }
         return conn;
     }
 
+    DefaultTableModel modelo;
+
     public Terrenos() {
 
         initComponents();
+        nuevaTabla();
+
+    }
+
+    public void nuevaTabla() {
         infoTable.getTableHeader().setFont(new Font("Roboto Light", Font.BOLD, 14));
         infoTable.getTableHeader().setOpaque(false);
         infoTable.getTableHeader().setBackground(new Color(32, 136, 203));
@@ -51,10 +57,33 @@ public class Terrenos extends javax.swing.JInternalFrame {
         modelo.addColumn("Precio");
         modelo.addColumn("Habitaciones");
         modelo.addColumn("Baños");
-        modelo.addColumn("Garaje");
         modelo.addColumn("Vendedor ID");
         modelo.addColumn("Comprador ID");
+        modelo.addColumn("Garaje");
         this.infoTable.setModel(modelo);
+
+        this.infoTable.setModel(modelo);
+        String[] datos = new String[8];
+        try {
+            Connection connet = establecerConexion();
+            String query = "select * from propiedades ";
+            st = connet.createStatement();
+            rs = st.executeQuery(query);
+            while (rs.next()) {
+                datos[0] = rs.getString(1);
+                datos[1] = rs.getString(2);
+                datos[2] = rs.getString(3);
+                datos[3] = rs.getString(4);
+                datos[4] = rs.getString(5);
+                datos[5] = rs.getString(6);
+                datos[6] = rs.getString(7);
+                datos[7] = rs.getString(8);
+                modelo.addRow(datos);
+            }
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+
     }
 
     /**
@@ -429,35 +458,27 @@ public class Terrenos extends javax.swing.JInternalFrame {
 
     private void newTextMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_newTextMouseClicked
         // Falta Definir que sigue
+        String descripcion = typeDescrip.getText();
+        int precio = Integer.parseInt(typeCost.getText());
+        int habitaciones = Integer.parseInt(typeRoom.getText());
+        int wc = Integer.parseInt(typeBath.getText());
+        int cochera = Integer.parseInt(typeCochera.getText());
 
-        String[] datos = new String[8];
-        datos[0] = ""; //Aqui va el ID de la propiedad ud verá como lo extrae de la base de datos
-        datos[1] = typeDescrip.getText();
-        datos[2] = typeCost.getText();
-        datos[3] = typeRoom.getText();
-        datos[4] = typeBath.getText();
-        datos[5] = typeCochera.getText();
-        datos[6] = "";
-        datos[7] = "";
-
-        String query = "INSERT INTO propiedades (tituloPropiedad, precioPropiedad,habitacionesPropiedad,"
-                + "wcPropiedad,vendedores_idVendedores,clientes_idClientes,garaje) VALUES (?,?,?,?,?,?,?) ";
+        String query = "INSERT INTO propiedades (tituloPropiedad, precioPropiedad,habitacionesPropiedad,wcPropiedad,garaje) VALUES (?,?,?,?,?) ";
         try {
-            Connection connet = Conectar();
+            Connection connet = establecerConexion();
             PreparedStatement ps = connet.prepareStatement(query);
-            ps.setString(1, datos[1]);
-            ps.setDouble(2,Double.parseDouble(datos[2]) );
-            ps.setInt(3, Integer.parseInt(datos[3]));
-            ps.setInt(4, Integer.parseInt(datos[4]));
-            ps.setInt(5,0 );
-            ps.setInt(6, 0);
-            ps.setInt(7, Integer.parseInt(datos[5]));
-
+            ps.setString(1, descripcion);
+            ps.setDouble(2, precio);
+            ps.setInt(3, habitaciones);
+            ps.setInt(4, wc);
+            ps.setInt(5, cochera);
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Registro exitoso");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.toString());
         }
+        nuevaTabla();
 
         typeDescrip.setText("250m este del centro de sabanilla, 150m2");
         typeDescrip.setForeground(Color.gray);

@@ -6,6 +6,11 @@ package Interfaces;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -15,26 +20,59 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Clientes extends javax.swing.JInternalFrame {
 
-    /**
-     * Creates new form Clientes
-     */
+    Statement st = null;
+    ResultSet rs = null;
+
+    public Connection establecerConexion() {
+        Connection conn = null;
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/facturacion_crud", "root", "HonDa8512118560745");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "No se puedo realizar la conexion" + e.toString());
+        }
+        return conn;
+    }
     DefaultTableModel modelo;
 
     public Clientes() {
         initComponents();
+        nuevaTabla();
+
+    }
+
+    public void nuevaTabla() {
         infoTable.getTableHeader().setFont(new Font("Roboto Light", Font.BOLD, 14));
         infoTable.getTableHeader().setOpaque(false);
         infoTable.getTableHeader().setBackground(new Color(32, 136, 203));
         infoTable.getTableHeader().setForeground(new Color(255, 255, 255));
         infoTable.setRowHeight(25);
-
         modelo = new DefaultTableModel();
         modelo.addColumn("ID");
         modelo.addColumn("Nombre");
         modelo.addColumn("Apellido");
-        modelo.addColumn("Telefono");
         modelo.addColumn("Email");
+        modelo.addColumn("Telefono");
+
         this.infoTable.setModel(modelo);
+        String[] datos = new String[5];
+        try {
+            Connection connet = establecerConexion();
+            String query = "select * from clientes ";
+            st = connet.createStatement();
+            rs = st.executeQuery(query);
+            while (rs.next()) {
+                datos[0] = rs.getString(1);
+                datos[1] = rs.getString(2);
+                datos[2] = rs.getString(3);
+                datos[3] = rs.getString(4);
+                datos[4] = rs.getString(5);
+                modelo.addRow(datos);
+            }
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
     }
 
     /**
@@ -317,13 +355,25 @@ public class Clientes extends javax.swing.JInternalFrame {
 
     private void newTextMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_newTextMouseClicked
         // Falta Definir que sigue
-        String[] datos = new String[8];
-        datos[0] = "1"; //Aqui va el ID de la propiedad ud verá como lo extrae de la base de datos
-        datos[1] = typeName.getText();
-        datos[2] = typeApellido.getText();
-        datos[3] = typePhone.getText();
-        datos[4] = typeEmail.getText();
-        modelo.addRow(datos);
+        String nombreVendedor = typeName.getText();
+        String apellidoVendedor = typeApellido.getText();
+        String telefonoVendedor = typePhone.getText();
+        String correoVendedor = typeEmail.getText();
+
+        String query = "INSERT INTO clientes (nombreCliente, apellidoCliente,telefonoCliente,correoCliente) VALUES (?,?,?,?) ";
+        try {
+            Connection connet = establecerConexion();
+            PreparedStatement ps = connet.prepareStatement(query);
+            ps.setString(1, nombreVendedor);
+            ps.setString(2, apellidoVendedor);
+            ps.setString(3, telefonoVendedor);
+            ps.setString(4, correoVendedor);
+            ps.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Registro exitoso");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.toString());
+        }
+        nuevaTabla();
 
         typeName.setText("Ingrese el nombre del cliente");
         typeName.setForeground(Color.gray);
@@ -489,7 +539,7 @@ public class Clientes extends javax.swing.JInternalFrame {
             typeEmail.setForeground(Color.black);
 
         }
-        
+
     }//GEN-LAST:event_typeEmailMousePressed
 
 

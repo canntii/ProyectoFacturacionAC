@@ -16,12 +16,15 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Empleados extends javax.swing.JInternalFrame {
 
-    public Connection Conectar() {
+    Statement st = null;
+    ResultSet rs = null;
+
+    public Connection establecerConexion() {
         Connection conn = null;
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sistemafacturacion", "root", "Wolfhack0504");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/facturacion_crud", "root", "HonDa8512118560745");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "No se puedo realizar la conexion" + e.toString());
         }
@@ -32,19 +35,43 @@ public class Empleados extends javax.swing.JInternalFrame {
 
     public Empleados() {
         initComponents();
+        nuevaTabla();
+
+    }
+
+    public void nuevaTabla() {
         infoTable.getTableHeader().setFont(new Font("Roboto Light", Font.BOLD, 14));
         infoTable.getTableHeader().setOpaque(false);
         infoTable.getTableHeader().setBackground(new Color(32, 136, 203));
         infoTable.getTableHeader().setForeground(new Color(255, 255, 255));
         infoTable.setRowHeight(25);
-
         modelo = new DefaultTableModel();
         modelo.addColumn("ID");
         modelo.addColumn("Nombre");
         modelo.addColumn("Apellido");
-        modelo.addColumn("Telefono");
         modelo.addColumn("Email");
+        modelo.addColumn("Contraseña");
+        modelo.addColumn("Telefono");
+
         this.infoTable.setModel(modelo);
+        String[] datos = new String[5];
+        try {
+            Connection connet = establecerConexion();
+            String query = "select * from vendedores ";
+            st = connet.createStatement();
+            rs = st.executeQuery(query);
+            while (rs.next()) {
+                datos[0] = rs.getString(1);
+                datos[1] = rs.getString(2);
+                datos[2] = rs.getString(3);
+                datos[3] = rs.getString(4);
+                datos[4] = rs.getString(5);
+                modelo.addRow(datos);
+            }
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+
     }
 
     /**
@@ -68,8 +95,7 @@ public class Empleados extends javax.swing.JInternalFrame {
         phoneText = new javax.swing.JLabel();
         typePhone = new javax.swing.JTextField();
         jSeparator6 = new javax.swing.JSeparator();
-        emailText = new javax.swing.JLabel();
-        typeEmail = new javax.swing.JTextField();
+        passwordText = new javax.swing.JLabel();
         jSeparator3 = new javax.swing.JSeparator();
         table = new javax.swing.JScrollPane();
         infoTable = new javax.swing.JTable();
@@ -79,6 +105,10 @@ public class Empleados extends javax.swing.JInternalFrame {
         deleteText = new javax.swing.JLabel();
         updateBtn = new javax.swing.JPanel();
         updateText = new javax.swing.JLabel();
+        emailText = new javax.swing.JLabel();
+        typeEmail = new javax.swing.JTextField();
+        typePassword = new javax.swing.JPasswordField();
+        jSeparator7 = new javax.swing.JSeparator();
 
         setPreferredSize(new java.awt.Dimension(910, 690));
 
@@ -153,28 +183,12 @@ public class Empleados extends javax.swing.JInternalFrame {
         jSeparator6.setForeground(new java.awt.Color(0, 0, 0));
         bg.add(jSeparator6, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 330, 220, 20));
 
-        emailText.setFont(new java.awt.Font("Roboto Light", 1, 18)); // NOI18N
-        emailText.setText("Email:");
-        bg.add(emailText, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 350, -1, -1));
-
-        typeEmail.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        typeEmail.setForeground(new java.awt.Color(153, 153, 153));
-        typeEmail.setText("example@gmail.com");
-        typeEmail.setBorder(null);
-        typeEmail.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                typeEmailMousePressed(evt);
-            }
-        });
-        typeEmail.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                typeEmailActionPerformed(evt);
-            }
-        });
-        bg.add(typeEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 380, 210, 30));
+        passwordText.setFont(new java.awt.Font("Roboto Light", 1, 18)); // NOI18N
+        passwordText.setText("Contraseña");
+        bg.add(passwordText, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 430, -1, -1));
 
         jSeparator3.setForeground(new java.awt.Color(0, 0, 0));
-        bg.add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 410, 220, 20));
+        bg.add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 480, 220, 20));
 
         infoTable.setFont(new java.awt.Font("Roboto Light", 1, 14)); // NOI18N
         infoTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -220,6 +234,9 @@ public class Empleados extends javax.swing.JInternalFrame {
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 newTextMouseExited(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                newTextMousePressed(evt);
             }
         });
 
@@ -306,6 +323,32 @@ public class Empleados extends javax.swing.JInternalFrame {
 
         bg.add(updateBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 450, -1, -1));
 
+        emailText.setFont(new java.awt.Font("Roboto Light", 1, 18)); // NOI18N
+        emailText.setText("Email:");
+        bg.add(emailText, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 350, -1, -1));
+
+        typeEmail.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
+        typeEmail.setForeground(new java.awt.Color(153, 153, 153));
+        typeEmail.setText("example@gmail.com");
+        typeEmail.setBorder(null);
+        typeEmail.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                typeEmailMousePressed(evt);
+            }
+        });
+        typeEmail.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                typeEmailActionPerformed(evt);
+            }
+        });
+        bg.add(typeEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 380, 210, 30));
+
+        typePassword.setText("jPasswordField1");
+        bg.add(typePassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 450, 210, 30));
+
+        jSeparator7.setForeground(new java.awt.Color(0, 0, 0));
+        bg.add(jSeparator7, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 410, 220, 20));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -323,28 +366,10 @@ public class Empleados extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void typeEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_typeEmailActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_typeEmailActionPerformed
-
     private void newTextMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_newTextMouseClicked
         // Falta Definir que sigue
-        String[] datos = new String[8];
-        datos[0] = "1"; //Aqui va el ID de la propiedad ud verá como lo extrae de la base de datos
-        datos[1] = typeName.getText();
-        datos[2] = typeApellido.getText();
-        datos[3] = typePhone.getText();
-        datos[4] = typeEmail.getText();
-        modelo.addRow(datos);
+        //
 
-        typeName.setText("Ingrese el nombre del empleado");
-        typeName.setForeground(Color.gray);
-        typeApellido.setText("Ingrese los apellidos del empleado");
-        typeApellido.setForeground(Color.gray);
-        typePhone.setText("70254804");
-        typePhone.setForeground(Color.gray);
-        typeEmail.setText("example@gmail.com");
-        typeEmail.setForeground(Color.gray);
     }//GEN-LAST:event_newTextMouseClicked
 
     private void newTextMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_newTextMouseEntered
@@ -478,30 +503,36 @@ public class Empleados extends javax.swing.JInternalFrame {
 
     private void typeEmailMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_typeEmailMousePressed
         // TODO add your handling code here:
-        if (typeName.getText().isEmpty()) {
-            typeName.setText("Ingrese el nombre del cliente");
-            typeName.setForeground(Color.gray);
-
-        }
-
-        if (typeApellido.getText().isEmpty()) {
-            typeApellido.setText("Ingrese los apellidos del cliente");
-            typeName.setForeground(Color.gray);
-
-        }
-
-        if (typePhone.getText().isEmpty()) {
-            typePhone.setText("70254804");
-            typePhone.setForeground(Color.gray);
-
-        }
-
-        if (typeEmail.getText().equals("example@gmail.com")) {
-            typeEmail.setText("");
-            typeEmail.setForeground(Color.black);
-
-        }
     }//GEN-LAST:event_typeEmailMousePressed
+
+    private void typeEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_typeEmailActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_typeEmailActionPerformed
+
+    private void newTextMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_newTextMousePressed
+        // TODO add your handling code here:
+        String nombreVendedor = typeName.getText();
+        String apellidoVendedor = typeApellido.getText();
+        String telefonoVendedor = typePhone.getText();
+        String correoVendedor = typeEmail.getText();
+        String passVendedor = String.valueOf(typePassword.getPassword()); //typeDescrip || typeCost || typeRoom || typeBath || typeCochera
+
+        String query = "INSERT INTO vendedores (nombreVendedor, apellidoVendedor,telefonoVendedor,correoVendedor,passw) VALUES (?,?,?,?,?) ";
+        try {
+            Connection connet = establecerConexion();
+            PreparedStatement ps = connet.prepareStatement(query);
+            ps.setString(1, nombreVendedor);
+            ps.setString(2, apellidoVendedor);
+            ps.setString(3, telefonoVendedor);
+            ps.setString(4, correoVendedor);
+            ps.setString(5, passVendedor);
+            ps.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Registro exitoso");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.toString());
+        }
+        nuevaTabla();
+    }//GEN-LAST:event_newTextMousePressed
 
 //Table vendedores
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -515,16 +546,19 @@ public class Empleados extends javax.swing.JInternalFrame {
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSeparator jSeparator6;
+    private javax.swing.JSeparator jSeparator7;
     private javax.swing.JLabel logoIcon;
     private javax.swing.JLabel nameText;
     private javax.swing.JPanel newBtn;
     private javax.swing.JLabel newText;
+    private javax.swing.JLabel passwordText;
     private javax.swing.JLabel phoneText;
     private javax.swing.JLabel registerText;
     private javax.swing.JScrollPane table;
     private javax.swing.JTextField typeApellido;
     private javax.swing.JTextField typeEmail;
     private javax.swing.JTextField typeName;
+    private javax.swing.JPasswordField typePassword;
     private javax.swing.JTextField typePhone;
     private javax.swing.JPanel updateBtn;
     private javax.swing.JLabel updateText;

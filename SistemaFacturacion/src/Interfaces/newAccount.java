@@ -22,12 +22,12 @@ public class newAccount extends javax.swing.JFrame {
      */
     int xPos, yPos;
 
-    public Connection Conectar() {
+    public Connection conectar() {
         Connection conn = null;
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sistemafacturacion", "root", "Wolfhack0504");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/facturacion_crud", "root", "HonDa8512118560745");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "No se puedo realizar la conexion" + e.toString());
         }
@@ -533,7 +533,7 @@ public class newAccount extends javax.swing.JFrame {
         String passVendedor = String.valueOf(this.typePass.getPassword());
         String query = "INSERT INTO vendedores (nombreVendedor, apellidoVendedor,telefonoVendedor,correoVendedor,passw) VALUES (?,?,?,?,?) ";
         try {
-            Connection connet = Conectar();
+            Connection connet = conectar();
             PreparedStatement ps = connet.prepareStatement(query);
             ps.setString(1, nombre);
             ps.setString(2, apellido);

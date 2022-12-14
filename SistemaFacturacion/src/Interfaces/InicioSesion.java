@@ -25,12 +25,12 @@ public class InicioSesion extends javax.swing.JFrame {
 
     private String nombre;
 
-    public Connection Conectar() {
+    public Connection conectar() {
         Connection conn = null;
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sistemafacturacion", "root", "Wolfhack0504");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/facturacion_crud", "root", "HonDa8512118560745");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "No se puedo realizar la conexion" + e.toString());
         }
@@ -372,7 +372,7 @@ public class InicioSesion extends javax.swing.JFrame {
     }//GEN-LAST:event_registroTextMouseClicked
 
     private void logTextButtonMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_logTextButtonMousePressed
-        // TODO add your handling code here:
+         // TODO add your handling code here:
         MenuPrincipal menuP = new MenuPrincipal();
         Connection conn1 = null;
         PreparedStatement ps = null;
@@ -387,7 +387,7 @@ public class InicioSesion extends javax.swing.JFrame {
             this.alertaClave.setForeground(Color.red);
         }
         try {
-            conn1 = Conectar();
+            conn1 = conectar();
             ps = conn1.prepareStatement("select correoVendedor, passw  from vendedores where correoVendedor = '" + correo + "' and passw = '" + pass + "'");
             rs = ps.executeQuery();
             if (rs.next()) {
@@ -395,7 +395,7 @@ public class InicioSesion extends javax.swing.JFrame {
                 PreparedStatement ps2 = null;
                 ResultSet rs2 = null;
                 try {
-                    conn2 = Conectar();
+                    conn2 = conectar();
                     ps2 = conn2.prepareStatement("select nombreVendedor  from vendedores where correoVendedor = '" + correo + "' ");
                     rs2 = ps2.executeQuery();
                     if (rs2.next()) {
